@@ -1,0 +1,11 @@
+services:
+  api:
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: docker/developer/Dockerfile
+    ports:
+      - ${PORT}:${PORT}
