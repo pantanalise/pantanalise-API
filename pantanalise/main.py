@@ -1,4 +1,5 @@
-from functools import reduce
+import distutils
+import os
 from os.path import join, dirname
 
 from dotenv import load_dotenv
@@ -7,7 +8,10 @@ from os import environ
 
 from uvicorn import run
 
-from pantanalise.model.sentiment_analysis_repository import SentimentAnalysisRepository
+from pantanalise.repository.bentoml.engage_predict_bentoml_repository import EngagePredictBentoMLRepository
+from pantanalise.repository.bentoml.word_predict_bentoml_repository import WordPredictBentoMLRepository
+from pantanalise.repository.model.word_predict_direct_repository import WordPredictDirectRepository
+from pantanalise.repository.model.sentiment_analysis_direct_repository import SentimentAnalysisDirectRepository
 from pantanalise.model_request.message_model import MessageModel
 
 app = FastAPI()
@@ -18,14 +22,23 @@ def read_root():
     return {"message": "Deu bom"}
 
 
-@app.post("/predict")
-def predict(body: MessageModel):
-    sentiment_analysis_repository = SentimentAnalysisRepository()
+@app.post("/predict/sentiment")
+def predict_sentiment(body: MessageModel):
+    sentiment_analysis_repository = SentimentAnalysisDirectRepository()
     sentiment_predict = sentiment_analysis_repository.predict(body.text)
 
-    return { "feeling" : sentiment_predict }
+    return {'sentimentWord' : sentiment_predict}
 
+@app.post("/predict/token")
+def predict_token(body: MessageModel):
+    bentoml_integration_activate =   distutils.util.strtobool(environ.get("BENTO_ML_INTEGRATION"))
+    if bentoml_integration_activate:
+        word_predict_repository = WordPredictBentoMLRepository()
+        word_recommend = word_predict_repository.predict(body.text)
+    else:
+        word_recommend = WordPredictDirectRepository().predict(body.text)
 
+    return { "recommendWord" : word_recommend }
 
 def start_server():
     dotenv_path = join(dirname(__file__), "../.env")

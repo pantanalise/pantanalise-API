@@ -1,2 +1,4 @@
 .env
-pantanalise/model/model.pth
+pantanalise/repository/model/final_masked_language_model.pth
+pantanalise/repository/model/token_classification.pth.pth
+htmlcov
