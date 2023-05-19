@@ -10,6 +10,7 @@ from os import environ
 
 from torch import nn
 from uvicorn import run
+from fastapi.middleware.cors import CORSMiddleware
 
 from pantanalise.repository.bentoml.engage_predict_bentoml_repository import EngagePredictBentoMLRepository
 from pantanalise.repository.bentoml.word_predict_bentoml_repository import WordPredictBentoMLRepository
@@ -72,6 +73,16 @@ def predict_engage(body: MessageModel):
         engage_recommendation = predict(body.text)
 
     return { "engageRecommend" : engage_recommendation }
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def start_server():
     dotenv_path = join(dirname(__file__), "../.env")
