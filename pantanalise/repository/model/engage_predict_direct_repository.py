@@ -71,7 +71,7 @@ def predict(data):
     retweets = int(output[0][0] / 9)
     print(f'likes:{like}')
     print(f'Retweets:{retweets}')
-    return {'like': like, 'retweets': retweets }
+    return {'likes': like, 'retweets': retweets }
 
 class BertEngagementRegressor(nn.Module):
     def __init__(self,model):
