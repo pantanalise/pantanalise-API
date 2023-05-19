@@ -10,8 +10,9 @@ from uvicorn import run
 
 from pantanalise.repository.bentoml.engage_predict_bentoml_repository import EngagePredictBentoMLRepository
 from pantanalise.repository.bentoml.word_predict_bentoml_repository import WordPredictBentoMLRepository
+from pantanalise.repository.model.engage_predict_direct_repository import predict
 from pantanalise.repository.model.word_predict_direct_repository import WordPredictDirectRepository
-from pantanalise.repository.model.sentiment_analysis_direct_repository import SentimentAnalysisDirectRepository
+from pantanalise.repository.model.sentiment_analysis_predict_direct_repository import SentimentAnalysisDirectRepository
 from pantanalise.model_request.message_model import MessageModel
 
 app = FastAPI()
@@ -39,6 +40,17 @@ def predict_token(body: MessageModel):
         word_recommend = WordPredictDirectRepository().predict(body.text)
 
     return { "recommendWord" : word_recommend }
+
+@app.post("/predict/engage")
+def predict_engage(body: MessageModel):
+    print(body.text)
+    bentoml_integration_activate =   distutils.util.strtobool(environ.get("BENTO_ML_INTEGRATION"))
+    if bentoml_integration_activate:
+        pass
+    else:
+        word_recommend = predict(body.text)
+
+    return { "recommendWord" : 'word_recommend' }
 
 def start_server():
     dotenv_path = join(dirname(__file__), "../.env")
