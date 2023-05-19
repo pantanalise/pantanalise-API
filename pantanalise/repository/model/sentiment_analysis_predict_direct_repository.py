@@ -31,7 +31,7 @@ class SentimentAnalysisDirectRepository(Predict):
         with torch.no_grad():
             output = model(input_ids)
         label_indices = np.argmax(output[0].to('cpu').numpy(), axis=2)
-        tag_values = ['I-neg', 'B-neg', 'O', 'B-pos', 'I-pos', 'PAD']
+        tag_values = ['O', 'I-neg', 'B-pos', 'I-pos', 'B-neg', 'PAD']
         tokens = tokenizer.convert_ids_to_tokens(input_ids.to('cpu').numpy()[0])
         new_tokens, new_labels = [], []
         for token, label_idx in zip(tokens, label_indices[0]):
