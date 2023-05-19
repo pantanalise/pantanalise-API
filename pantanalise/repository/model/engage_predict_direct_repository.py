@@ -12,7 +12,6 @@ import torch
 import torch.nn as nn
 from typing import Tuple
 
-INPUT = "Além disso, considerou o Brasil um lider na promoção do esporte escolar no mundo após a volta dos Jogos Escolares Brasileiros (JEBs), passados mais de 15 anos sem sua realização."
 MODEL_PATH = join(dirname(__file__), "regressor_model_0.pth")
 SCALER_PATH= join(dirname(__file__), "fitted_std_scaler.save")
 
@@ -55,21 +54,24 @@ def clean_tweet(tweet):
 def predict(data):
     print(MODEL_PATH)
     print(SCALER_PATH)
-    tweet = clean_tweet(INPUT)
+    tweet = clean_tweet(data)
     tweet = tokenizer(tweet, truncation=True, padding=True, max_length=512, is_split_into_words=True,
                        return_tensors='pt')
     regressor_model = torch.load(MODEL_PATH)
-    #
-    # device = torch.device("cpu")
-    #
-    # regressor_model.to(device)
-    #
-    # regressor_model.eval()
-    # output = regressor_model(tweet['input_ids'], tweet['attention_mask'])
-    # engagement_scaler = joblib.load(SCALER_PATH)
-    # output = engagement_scaler.inverse_transform(output.detach().numpy().reshape(-1, 1))
-    # print(f'likes:{int(output[0][0] * 8 / 9)}')
-    # print(f'Retweets:{int(output[0][0] / 9)}')
+
+    device = torch.device("cpu")
+
+    regressor_model.to(device)
+
+    regressor_model.eval()
+    output = regressor_model(tweet['input_ids'], tweet['attention_mask'])
+    engagement_scaler = joblib.load(SCALER_PATH)
+    output = engagement_scaler.inverse_transform(output.detach().numpy().reshape(-1, 1))
+    like = int(output[0][0] * 8 / 9)
+    retweets = int(output[0][0] / 9)
+    print(f'likes:{like}')
+    print(f'Retweets:{retweets}')
+    return {'like': like, 'retweets': retweets }
 
 class BertEngagementRegressor(nn.Module):
     def __init__(self,model):
